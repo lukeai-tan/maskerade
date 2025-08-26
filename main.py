@@ -11,6 +11,8 @@ def redact_image(input_path, output_path, min_confidence=0.5):
     merged_results = detect_text(img, min_confidence=min_confidence)  # OCR + merge boxes
 
     for bbox, text, prob in merged_results:
+        if(prob < min_confidence):
+            continue;
         if analyze_pii(text):
             img = blur_bbox(img, bbox)
 
@@ -18,6 +20,6 @@ def redact_image(input_path, output_path, min_confidence=0.5):
     print(f"Redacted image saved as {output_path}")
 
 if __name__ == "__main__":
-    input_path = "uploads/pii_test.png"  # edit as needed
+    input_path = "uploads/creditcard.jpg"  # edit as needed
     output_path = "output/blurred_output.jpg"
     redact_image(input_path, output_path, min_confidence=0.5)
