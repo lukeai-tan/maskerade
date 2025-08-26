@@ -1,17 +1,7 @@
-# OCR
-easyocr==1.6.2
-
-# Image processing
-opencv-python==4.7.0.72
-
-# Microsoft Presidio
-presidio-analyzer==2.3.0
-
-# PyTorch (required by EasyOCR)
-torch>=2.1.0
-
-# Optional: for faster computations on CPU
-torchvision>=0.16.0
-
-# Numpy (required by OpenCV and EasyOCR)
-numpy>=1.25.0
+opencv-python
+easyocr
+numpy
+face_recognition
+dlib
+cmake
+presidio-analyzer
