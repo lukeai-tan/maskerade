@@ -1,0 +1,35 @@
+# Byte-compiled / Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.env/
+.venv/
+maskerade-env/
+
+# Pipenv / Poetry
+Pipfile.lock
+poetry.lock
+
+# IDEs / editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker
+*.dockerfile
+*.env  # if you have secret environment variables
+
+# Pytest / coverage
+.coverage
+htmlcov/
+*.pytest_cache/
