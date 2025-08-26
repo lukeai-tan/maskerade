@@ -8,7 +8,7 @@ def blur_bbox(img, bbox, blur_strength=(25, 25)):
     x_min, x_max = int(min(x_coords)), int(max(x_coords))
     y_min, y_max = int(min(y_coords)), int(max(y_coords))
     roi = img[y_min:y_max, x_min:x_max]
-    img[y_min:y_max, x_min:x_max] = cv2.GaussianBlur(roi, blur_strength)
+    img[y_min:y_max, x_min:x_max] = cv2.GaussianBlur(roi, blur_strength, 30)
     return img
 
 def save_image(img, output_path):

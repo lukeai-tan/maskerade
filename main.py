@@ -15,9 +15,9 @@ def redact_image(input_path, output_path, min_confidence=0.5):
             img = blur_bbox(img, bbox)
 
     save_image(img, output_path)
-    print(f"Blurred image saved as {output_path}")
+    print(f"Redacted image saved as {output_path}")
 
 if __name__ == "__main__":
-    input_path = "uploads/faces.jpg"  # edit as needed
+    input_path = "uploads/pii_test.png"  # edit as needed
     output_path = "output/blurred_output.jpg"
     redact_image(input_path, output_path, min_confidence=0.5)
