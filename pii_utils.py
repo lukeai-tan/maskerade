@@ -16,14 +16,14 @@ def analyze_pii(text):
         text=text,
         entities=[
             #"PERSON",
-            "PHONE_NUMBER",
+            "PHONE_NUMBER", # local & international phone numbers
             "EMAIL_ADDRESS",
-            "US_SSN",
-            "CREDIT_CARD_NUMBER",
-            "NRP",
-            "LOCATION",
-            "IP_ADDRESS",
-            "IBAN_CODE",
+            "US_SSN", # U.S. Social Security Numbers
+            "CREDIT_CARD_NUMBER", # most cards (Visa, Mastercard, etc.)
+            "NRP", # "number-related patterns" (URLs, domain names, etc.)
+            "LOCATION", # city, country, addresses
+            "IP_ADDRESS", # IPv4 + IPv6 addresses
+            "IBAN_CODE", # international bank account numbers
             "US_DRIVER_LICENSE",
             "US_PASSPORT"
         ],
