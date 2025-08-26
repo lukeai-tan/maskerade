@@ -3,5 +3,4 @@ easyocr
 numpy
 face_recognition
 dlib
-cmake
 presidio-analyzer
