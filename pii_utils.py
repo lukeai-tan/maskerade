@@ -12,10 +12,21 @@ cc_recognizer = PatternRecognizer(supported_entity="CREDIT_CARD_NUMBER", pattern
 analyzer.registry.add_recognizer(cc_recognizer)
 
 def analyze_pii(text):
-    return analyzer.analyze(text=text, 
-                            entities=["PERSON", 
-                            "PHONE_NUMBER", 
-                            "CREDIT_CARD_NUMBER", 
-                            "EMAIL_ADDRESS",
-                            "US_SSN"], 
-                            language="en")
+    return analyzer.analyze(
+        text=text,
+        entities=[
+            #"PERSON",
+            "PHONE_NUMBER",
+            "EMAIL_ADDRESS",
+            "US_SSN",
+            "CREDIT_CARD_NUMBER",
+            "NRP",
+            "LOCATION",
+            "IP_ADDRESS",
+            "IBAN_CODE",
+            "US_DRIVER_LICENSE",
+            "US_PASSPORT"
+        ],
+        language="en"
+    )
+
