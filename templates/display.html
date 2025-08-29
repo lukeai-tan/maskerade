@@ -3,14 +3,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Redacted Image and Table</title>
+    <title>Masked Image and Table</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="split-container">
         <div class="left-pane">
-            <h2>Redacted Image</h2>
-            <img src="{{ image_url }}" alt="Redacted Image" style="max-width:500px;">
+            <h2>Masked Image</h2>
+            <img src="{{ image_url }}" alt="Masked Image" style="max-width:500px;">
+            <br>
+            <a href="{{ image_url }}" download>Download image</a>
         </div>
         <div class="right-pane">
             <h2>Data Table</h2>
