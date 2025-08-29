@@ -25,6 +25,10 @@ Thumbs.db
 # Logs
 *.log
 
+# Image files
+*.jpg
+*.jpeg
+
 # Docker
 *.dockerfile
 *.env  # if you have secret environment variables
