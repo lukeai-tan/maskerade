@@ -1,6 +1,7 @@
 import cv2
 import face_recognition
 
+
 def blur_faces(img, blur_strength=(55, 55)):
     rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     face_locations = face_recognition.face_locations(rgb_img)

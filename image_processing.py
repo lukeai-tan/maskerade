@@ -1,6 +1,7 @@
 import cv2
 import os
 
+
 def blur_bbox(img, bbox, blur_strength=(25, 25)):
     tl, tr, br, bl = bbox
     x_coords = [tl[0], tr[0], br[0], bl[0]]
@@ -10,6 +11,7 @@ def blur_bbox(img, bbox, blur_strength=(25, 25)):
     roi = img[y_min:y_max, x_min:x_max]
     img[y_min:y_max, x_min:x_max] = cv2.GaussianBlur(roi, blur_strength, 30)
     return img
+
 
 def save_image(img, output_path):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)

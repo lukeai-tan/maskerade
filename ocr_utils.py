@@ -1,8 +1,11 @@
 import easyocr
 
-reader = easyocr.Reader(['en'])
+reader = easyocr.Reader(["en"])
 
-def merge_boxes(results, x_threshold=20, y_threshold=10, min_confidence=0.5):
+
+def merge_boxes(
+    results, x_threshold: int = 20, y_threshold: int = 10, min_confidence: float = 0.5
+):
     """
     Merge OCR boxes that are close horizontally and vertically.
     Returns list of tuples: (merged_bbox, merged_text, avg_confidence)
@@ -42,12 +45,13 @@ def merge_boxes(results, x_threshold=20, y_threshold=10, min_confidence=0.5):
                 used.add(j)
 
         merged_bbox = [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)]
-        avg_prob = sum(probs)/len(probs)
+        avg_prob = sum(probs) / len(probs)
         merged.append((merged_bbox, merged_text, avg_prob))
 
     return merged
 
-def detect_text(img, min_confidence=0.5):
+
+def detect_text(img, min_confidence: float = 0.5):
     results = reader.readtext(img)
     merged_results = merge_boxes(results, min_confidence=min_confidence)
     return merged_results

@@ -1,0 +1,14 @@
+{
+  "typeCheckingMode": "strict",
+  "reportUnusedImport": true,
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "reportOptionalMemberAccess": true,
+  "reportOptionalSubscript": true,
+  "reportPrivateUsage": true,
+  "reportUnboundVariable": true,
+  "reportUntypedFunctionDecorator": true,
+  "reportUnknownMemberType": true,
+  "include": ["."],
+  "exclude": ["**/__pycache__", "**/venv", "**/.venv"]
+}

@@ -1,0 +1,56 @@
+/* static/css/style.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 50%;
+    margin: 50px auto;
+    text-align: center;
+}
+
+form input[type="file"] {
+    margin-bottom: 15px;
+}
+
+.split-container {
+    display: flex;
+    height: 100vh;
+}
+
+.left-pane, .right-pane {
+    flex: 1;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+.left-pane {
+    background-color: #f5f5f5;
+    text-align: center;
+}
+
+.left-pane img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+}
+
+.right-pane {
+    background-color: #ffffff;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
