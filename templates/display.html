@@ -3,18 +3,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Display Image and Table</title>
+    <title>Redacted Image and Table</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="split-container">
         <div class="left-pane">
-            <h2>Uploaded Image</h2>
-            <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image">
+            <h2>Redacted Image</h2>
+            <img src="{{ image_url }}" alt="Redacted Image" style="max-width:500px;">
         </div>
         <div class="right-pane">
             <h2>Data Table</h2>
-            <table>
+            <table border="1">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -22,9 +22,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>Item 1</td><td>Value A</td></tr>
-                    <tr><td>Item 2</td><td>Value B</td></tr>
-                    <tr><td>Item 3</td><td>Value C</td></tr>
+                    {% for row in table_data %}
+                    <tr>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.value }}</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

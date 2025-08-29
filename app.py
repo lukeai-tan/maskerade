@@ -8,12 +8,19 @@ from flask import (
 )
 import os
 from werkzeug.utils import secure_filename
+from redact_image_call import redact_image
 
 UPLOAD_FOLDER = "uploads/"
+OUTPUT_FOLDER = "outputs/"
 ALLOWED_EXTENSIONS = {"txt", "pdf", "png", "jpg", "jpeg", "gif"}
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["OUTPUT_FOLDER"] = OUTPUT_FOLDER
+
+# Ensure folders exist
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+os.makedirs(app.config["OUTPUT_FOLDER"], exist_ok=True)
 
 
 @app.route("/", methods=["GET"])
@@ -32,7 +39,10 @@ def upload_image():
 
     filename = secure_filename(image.filename)
     filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    output_path = os.path.join(app.config["OUTPUT_FOLDER"], filename)
     image.save(filepath)
+
+    redact_image(input_path=filepath, output_path=output_path, min_confidence=0.5)
 
     # Dummy table data
     table_data = [
@@ -44,7 +54,7 @@ def upload_image():
     return render_template(
         "display.html",
         view="display",
-        image_url=url_for("uploaded_file", filename=filename),
+        image_url=url_for("output_file", filename=filename),
         table_data=table_data,
     )
 
@@ -52,3 +62,7 @@ def upload_image():
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
+@app.route("/outputs/<filename>")
+def output_file(filename):
+    return send_from_directory(app.config["OUTPUT_FOLDER"], filename)
