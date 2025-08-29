@@ -1,8 +1,10 @@
 from presidio_analyzer import AnalyzerEngine, PatternRecognizer, Pattern
 from presidio_analyzer import RecognizerResult
+from presidio_anonymizer import AnonymizerEngine
 from typing import List
 
-analyzer: AnalyzerEngine = AnalyzerEngine()
+analyzer = AnalyzerEngine()
+anonymizer = AnonymizerEngine()
 
 # Custom recognizer for full credit card numbers
 credit_card_pattern: Pattern = Pattern(
@@ -32,3 +34,7 @@ def analyze_pii(text: str) -> List[RecognizerResult]:
         ],
         language="en",
     )
+
+def anonymize_pii(text: str, results: List[RecognizerResult]):
+    anonymized_text = anonymizer.anonymize(text=text, analyzer_results=results)
+    return anonymized_text
