@@ -1,8 +1,14 @@
 import cv2
 import os
+import numpy as np
+from typing import Any
 
 
-def blur_bbox(img, bbox, blur_strength=(25, 25)):
+def blur_bbox(
+    img: np.ndarray[Any, Any],
+    bbox: list[tuple[int, int]],
+    blur_strength: tuple[int, int] = (25, 25)
+) -> np.ndarray[Any, Any]:
     tl, tr, br, bl = bbox
     x_coords = [tl[0], tr[0], br[0], bl[0]]
     y_coords = [tl[1], tr[1], br[1], bl[1]]
@@ -13,6 +19,6 @@ def blur_bbox(img, bbox, blur_strength=(25, 25)):
     return img
 
 
-def save_image(img, output_path):
+def save_image(img: np.ndarray[Any, Any], output_path: str) -> None:
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     cv2.imwrite(output_path, img)
