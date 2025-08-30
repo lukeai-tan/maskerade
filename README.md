@@ -15,7 +15,7 @@ PII Detection: presidio-analyzer
 Frontend: HTML5, CSS3, JavaScript
 
 ## Requirements
-- Python 3.13
+- Python 3.13.7
 - pip (Python package manager)
 - The following Python packages (installed automatically via `requirements.txt`):
   - Flask
