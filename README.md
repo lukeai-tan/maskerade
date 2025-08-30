@@ -10,10 +10,10 @@ In the era of digital sharing, privacy often takes a back seat. Maskerade is a s
 - Pick and choose which data to "mask"
 
 ## Tech Stack  
-Backend: Python 3.13.7, Flask, Flask-Session
-Image Processing: OpenCV, face_recognition, easyocr, numpy
-PII Detection: presidio-analyzer
-Frontend: HTML5, CSS3, JavaScript
+- Backend: Python 3.13.7, Flask, Flask-Session
+- Image Processing: OpenCV, face_recognition, easyocr, numpy
+- PII Detection: presidio-analyzer
+- Frontend: HTML5, CSS3, JavaScript
 
 ## Requirements
 - Python 3.13.7
