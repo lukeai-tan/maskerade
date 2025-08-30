@@ -1,53 +1,38 @@
 import easyocr
 
-reader = easyocr.Reader(['en'])
+from pii_utils import analyze_pii
+from custom_types import CensorRegion
+from image_processing import preprocess_text
 
-def merge_boxes(results, x_threshold=20, y_threshold=10, min_confidence=0.5):
-    """
-    Merge OCR boxes that are close horizontally and vertically.
-    Returns list of tuples: (merged_bbox, merged_text, avg_confidence)
-    """
-    merged = []
-    used = set()
+reader: easyocr.Reader = easyocr.Reader(["en"])
 
-    for i, (bbox1, text1, prob1) in enumerate(results):
-        if prob1 < min_confidence:  # skip low-confidence text
-            continue
-        if i in used:
-            continue
-        x1s = [p[0] for p in bbox1]
-        y1s = [p[1] for p in bbox1]
-        x_min = min(x1s)
-        x_max = max(x1s)
-        y_min = min(y1s)
-        y_max = max(y1s)
-        merged_text = text1
-        probs = [prob1]
 
-        for j, (bbox2, text2, prob2) in enumerate(results):
-            if prob2 < min_confidence or j <= i or j in used:
-                continue
-            x2s = [p[0] for p in bbox2]
-            y2s = [p[1] for p in bbox2]
-            x2_min, x2_max = min(x2s), max(x2s)
-            y2_min, y2_max = min(y2s), max(y2s)
+def detect_pii_text(img: object) -> list[CensorRegion]:
+    print("OCR Running")
+    ocr_results = reader.readtext(preprocess_text(img), text_threshold=0.6, low_text=0.3)  # type: ignore
 
-            if abs(x_min - x2_min) < x_threshold and abs(y_min - y2_min) < y_threshold:
-                x_min = min(x_min, x2_min)
-                x_max = max(x_max, x2_max)
-                y_min = min(y_min, y2_min)
-                y_max = max(y_max, y2_max)
-                merged_text += " " + text2
-                probs.append(prob2)
-                used.add(j)
+    censor_regions: list[CensorRegion] = []
 
-        merged_bbox = [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)]
-        avg_prob = sum(probs)/len(probs)
-        merged.append((merged_bbox, merged_text, avg_prob))
+    for region in ocr_results:  # type: ignore
 
-    return merged
+        # bbox: list of 4 points [ [x, y], ... ] representing corners in this order:
+        # top-left, top-right, bottom-right, bottom-left
+        bbox: list[list[int]] = region[0]  # type: ignore
 
-def detect_text(img, min_confidence=0.5):
-    results = reader.readtext(img)
-    merged_results = merge_boxes(results, min_confidence=min_confidence)
-    return merged_results
+        text: str = region[1]  # type: ignore
+        probability: float = region[2]  # type: ignore
+
+        # Convert bbox to (x_min, y_min, x_max, y_max)
+        x_coords = [point[0] for point in bbox]
+        y_coords = [point[1] for point in bbox]
+        bbox_tuple = (min(x_coords), min(y_coords), max(x_coords), max(y_coords))
+
+        pii_name: str = f"PII Text: {text.split(' ')[:min(3, len(text.split(' ')))]}"  # type: ignore
+        pii_results: list[RecognizerResult] = analyze_pii(text)  # type: ignore
+        should_censor = len(pii_results) > 0  # type: ignore
+
+        if should_censor:
+            censor_regions.append(CensorRegion(name=pii_name, bbox=bbox_tuple))
+
+    print("OCR Completed")
+    return censor_regions

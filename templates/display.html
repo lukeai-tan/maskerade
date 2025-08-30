@@ -1,0 +1,229 @@
+<!-- templates/display.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Maskerade - Masked Image</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', Arial, sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .split-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        .left-pane {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            max-width: 700px; 
+            text-align: center;
+            flex-shrink: 0; 
+        }
+        
+        .right-pane {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+
+            /* Scrollable */
+            max-height: 80vh;
+            overflow-y: auto;
+            min-width: 300px;
+            max-width: 500px;
+        }
+        
+        .left-pane img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+        }
+        
+        .left-pane a {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #ff4081;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        
+        .left-pane a:hover {
+            background-color: #e91e63;
+        }
+        
+        h2, h3 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+        }
+        
+        table, th, td {
+            border: 1px solid #fff;
+        }
+        
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #333; /* solid dark background */
+            position: sticky;
+            top: 0; /* keeps header fixed */
+            z-index: 2;
+        }
+        
+        td {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* Select all button */
+        #toggle-all {
+            display: block;
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Open Sans', Arial, sans-serif;
+        }
+
+        #toggle-all:hover {
+            background-color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="split-container">
+        <div class="left-pane">
+            <img id="redacted-image" src="{{ image_url }}" alt="Masked Image">
+            <a id="download-link" href="{{ image_url }}" download>Download Masked Image</a>
+        </div>
+        <div class="right-pane">
+            <h3>Choose what to mask</h3>
+            <button id="toggle-all">Select All</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Region</th>
+                        <th>Name</th>
+                        <th>Mask?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in table_data %}
+                    <tr>
+                        <td>
+                            <img src="{{ row.image_url }}" alt="{{ row.name }}" style="max-width: 150px; max-height: 150px; object-fit: contain;">
+                        </td>
+                        <td>{{ row.name }}</td>
+                        <td>
+                            <input
+                            type="checkbox"
+                            data-idx="{{ loop.index0 }}"
+                            {% if row.is_censored %}checked{% endif %}
+                            >
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const downloadLink = document.getElementById('download-link');
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][data-idx]');
+        const redactedImage = document.getElementById('redacted-image');
+        const toggleAllBtn = document.getElementById('toggle-all');
+
+        // updates button description with state change
+        function updateToggleButton() {
+            const allChecked = [...checkboxes].every(cb => cb.checked);
+            toggleAllBtn.textContent = allChecked ? "Deselect All" : "Select All";
+        }
+        
+        // No buttons selected: Select All
+        // Partial buttons selected: Select All
+        // All buttons selected: Deselect All
+
+        toggleAllBtn.addEventListener('click', () => {
+            const allChecked = [...checkboxes].every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allChecked);
+            updateToggleButton();
+            triggerUpdate();
+        });
+
+        // Shared update function
+        function triggerUpdate() {
+            const states = [];
+            checkboxes.forEach(chk => {
+                states.push({
+                    idx: chk.dataset.idx,
+                    is_censored: chk.checked
+                });
+            });
+
+            fetch('{{ url_for("update_censor_regions") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(states),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.image_url) {
+                    redactedImage.src = data.image_url;
+                    downloadLink.href = data.image_url;
+                } else {
+                    alert('Failed to update image.');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+            });
+        }
+
+        checkboxes.forEach(cb => cb.addEventListener('change', () => {
+            updateToggleButton();
+            triggerUpdate();
+        }));
+
+        // Initial button state
+        updateToggleButton();
+    });
+</script>
