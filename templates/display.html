@@ -36,6 +36,12 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+
+            /* Scrollable */
+            max-height: 80vh;
+            overflow-y: auto;
+            min-width: 300px;
+            max-width: 500px;
         }
         
         .left-pane img {
@@ -63,12 +69,13 @@
             background-color: #e91e63;
         }
         
-        h2 {
+        h2, h3 {
             text-align: center;
-            font-size: 28px;
+            font-size: 24px;
             margin-bottom: 20px;
         }
-        
+
+        /* Table styling */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -85,11 +92,34 @@
         }
         
         th {
-            background-color: rgba(255,255,255,0.2);
+            background-color: #333; /* solid dark background */
+            position: sticky;
+            top: 0; /* keeps header fixed */
+            z-index: 2;
         }
         
         td {
             background-color: rgba(255,255,255,0.1);
+        }
+
+        /* Select all button */
+        #toggle-all {
+            display: block;
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Open Sans', Arial, sans-serif;
+        }
+
+        #toggle-all:hover {
+            background-color: #388e3c;
         }
     </style>
 </head>
@@ -101,12 +131,13 @@
         </div>
         <div class="right-pane">
             <h3>Choose what to mask</h3>
+            <button id="toggle-all">Select All</button>
             <table>
                 <thead>
                     <tr>
                         <th>Region</th>
                         <th>Name</th>
-                        <th>Censor?</th>
+                        <th>Mask?</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -135,46 +166,64 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const downloadLink = document.getElementById('download-link');
-        console.log('Download link:', downloadLink);  // Check if the element exists
-        
-        if (!downloadLink) {
-            console.error('Download link element not found!');
-            return;
-        }
-        
         const checkboxes = document.querySelectorAll('input[type="checkbox"][data-idx]');
         const redactedImage = document.getElementById('redacted-image');
+        const toggleAllBtn = document.getElementById('toggle-all');
+
+        // updates button description with state change
+        function updateToggleButton() {
+            const allChecked = [...checkboxes].every(cb => cb.checked);
+            toggleAllBtn.textContent = allChecked ? "Deselect All" : "Select All";
+        }
         
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                const states = [];
-                checkboxes.forEach(chk => {
-                    states.push({
-                        idx: chk.dataset.idx,
-                        is_censored: chk.checked
-                    });
-                });
-                
-                fetch('{{ url_for("update_censor_regions") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(states),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.image_url) {
-                        redactedImage.src = data.image_url;
-                        downloadLink.href = data.image_url;
-                    } else {
-                        alert('Failed to update image.');
-                    }
-                })
-                .catch(err => {
-                    console.error('Error:', err);
+        // No buttons selected: Select All
+        // Partial buttons selected: Select All
+        // All buttons selected: Deselect All
+
+        toggleAllBtn.addEventListener('click', () => {
+            const allChecked = [...checkboxes].every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allChecked);
+            updateToggleButton();
+            triggerUpdate();
+        });
+
+        // Shared update function
+        function triggerUpdate() {
+            const states = [];
+            checkboxes.forEach(chk => {
+                states.push({
+                    idx: chk.dataset.idx,
+                    is_censored: chk.checked
                 });
             });
-        });
+
+            fetch('{{ url_for("update_censor_regions") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(states),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.image_url) {
+                    redactedImage.src = data.image_url;
+                    downloadLink.href = data.image_url;
+                } else {
+                    alert('Failed to update image.');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+            });
+        }
+
+        checkboxes.forEach(cb => cb.addEventListener('change', () => {
+            updateToggleButton();
+            triggerUpdate();
+        }));
+
+        // Initial button state
+        updateToggleButton();
     });
 </script>
