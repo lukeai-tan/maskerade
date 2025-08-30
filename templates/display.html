@@ -13,14 +13,14 @@
             margin: 0;
             padding: 20px;
         }
-
+        
         .split-container {
             display: flex;
             gap: 30px;
             justify-content: center;
             align-items: flex-start;
         }
-
+        
         .left-pane {
             background-color: rgba(0, 0, 0, 0.6);
             padding: 20px;
@@ -37,7 +37,7 @@
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
-
+        
         .left-pane img {
             max-width: 100%;
             height: auto;
@@ -45,7 +45,7 @@
             margin: 0 auto;
             border-radius: 8px;
         }
-
+        
         .left-pane a {
             display: block;
             text-align: center;
@@ -58,36 +58,36 @@
             font-weight: 600;
             transition: 0.3s;
         }
-
+        
         .left-pane a:hover {
             background-color: #e91e63;
         }
-
+        
         h2 {
             text-align: center;
             font-size: 28px;
             margin-bottom: 20px;
         }
-
+        
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 16px;
         }
-
+        
         table, th, td {
             border: 1px solid #fff;
         }
-
+        
         th, td {
             padding: 8px;
             text-align: left;
         }
-
+        
         th {
             background-color: rgba(255,255,255,0.2);
         }
-
+        
         td {
             background-color: rgba(255,255,255,0.1);
         }
@@ -96,24 +96,33 @@
 <body>
     <div class="split-container">
         <div class="left-pane">
-            <h2>Masked Image</h2>
-            <img src="{{ image_url }}" alt="Masked Image">
-            <a href="{{ image_url }}" download>Download Masked Image</a>
+            <img id="redacted-image" src="{{ image_url }}" alt="Masked Image">
+            <a id="download-link" href="{{ image_url }}" download>Download Masked Image</a>
         </div>
         <div class="right-pane">
-            <h2>Data Table</h2>
+            <h3>Choose what to mask</h3>
             <table>
                 <thead>
                     <tr>
+                        <th>Region</th>
                         <th>Name</th>
-                        <th>Value</th>
+                        <th>Censor?</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in table_data %}
                     <tr>
+                        <td>
+                            <img src="{{ row.image_url }}" alt="{{ row.name }}" style="max-width: 150px; max-height: 150px; object-fit: contain;">
+                        </td>
                         <td>{{ row.name }}</td>
-                        <td>{{ row.value }}</td>
+                        <td>
+                            <input
+                            type="checkbox"
+                            data-idx="{{ loop.index0 }}"
+                            {% if row.is_censored %}checked{% endif %}
+                            >
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -123,3 +132,49 @@
 </body>
 </html>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const downloadLink = document.getElementById('download-link');
+        console.log('Download link:', downloadLink);  // Check if the element exists
+        
+        if (!downloadLink) {
+            console.error('Download link element not found!');
+            return;
+        }
+        
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][data-idx]');
+        const redactedImage = document.getElementById('redacted-image');
+        
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const states = [];
+                checkboxes.forEach(chk => {
+                    states.push({
+                        idx: chk.dataset.idx,
+                        is_censored: chk.checked
+                    });
+                });
+                
+                fetch('{{ url_for("update_censor_regions") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(states),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.image_url) {
+                        redactedImage.src = data.image_url;
+                        downloadLink.href = data.image_url;
+                    } else {
+                        alert('Failed to update image.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                });
+            });
+        });
+    });
+</script>

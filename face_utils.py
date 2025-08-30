@@ -1,15 +1,26 @@
 import cv2
 import face_recognition
-import numpy as np
-from typing import Any
 
-def blur_faces(
-    img: np.ndarray[Any, Any],
-    blur_strength: tuple[int, int] = (55, 55)
-) -> np.ndarray[Any, Any]:
-    rgb_img: np.ndarray[Any, Any] = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    face_locations: list[tuple[int, int, int, int]] = face_recognition.face_locations(rgb_img)  # type: ignore
-    for top, right, bottom, left in face_locations:
-        roi: np.ndarray[Any, Any] = img[top:bottom, left:right]
-        img[top:bottom, left:right] = cv2.GaussianBlur(roi, blur_strength, 0)
-    return img
+from custom_types import CensorRegion
+from image_processing import preprocess_faces
+
+
+def detect_faces(img: cv2.typing.MatLike) -> list[CensorRegion]:
+    """Detect faces and return a list of CensorRegion objects.
+
+    Each CensorRegion bbox is in [top, right, bottom, left] format.
+    """
+    print("Facial detection running")
+
+    face_locations = face_recognition.face_locations(preprocess_faces(img))  # type: ignore
+    print(str(len(face_locations)) + " detected")
+
+    print("Facial Detection Completed")
+
+    # Convert to [left, top, right, bottom] format for OpenCV
+    return [
+        CensorRegion(
+            name=f"face_{i}", bbox=(loc[3] - 8, loc[0] - 8, loc[1] + 8, loc[2] + 8)
+        )  # loc is (top, right, bottom, left) # type: ignore
+        for i, loc in enumerate(face_locations)  # type: ignore
+    ]

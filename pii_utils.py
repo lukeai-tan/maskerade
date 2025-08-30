@@ -1,6 +1,5 @@
 from presidio_analyzer import AnalyzerEngine, PatternRecognizer, Pattern
 from presidio_analyzer import RecognizerResult
-from typing import List
 
 analyzer = AnalyzerEngine()
 
@@ -14,21 +13,23 @@ cc_recognizer: PatternRecognizer = PatternRecognizer(
 analyzer.registry.add_recognizer(cc_recognizer)
 
 
-def analyze_pii(text: str) -> List[RecognizerResult]:
+def analyze_pii(text: str) -> list[RecognizerResult]:
     return analyzer.analyze(
         text=text,
         entities=[
-            # "PERSON",
+            "PERSON",
+            "CRYPTO",  # Bitcoin wallets
             "PHONE_NUMBER",  # local & international phone numbers
             "EMAIL_ADDRESS",
             "US_SSN",  # U.S. Social Security Numbers
-            "CREDIT_CARD_NUMBER",  # most cards (Visa, Mastercard, etc.)
-            "NRP",  # "number-related patterns" (URLs, domain names, etc.)
+            "CREDIT_CARD",
+            "NRP",  # Nationality, Religious, Political groups
             "LOCATION",  # city, country, addresses
             "IP_ADDRESS",  # IPv4 + IPv6 addresses
             "IBAN_CODE",  # international bank account numbers
-            "US_DRIVER_LICENSE",
-            "US_PASSPORT",
+            "US_DRIVER_LICENSE",  # US Driver License
+            "US_PASSPORT",  # US Passport Number
+            "SG_NRIC_FIN",  # SG NRIC
         ],
         language="en",
     )
