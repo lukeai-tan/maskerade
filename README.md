@@ -37,4 +37,4 @@ Frontend: HTML5, CSS3, JavaScript
 ## Contributors  
 - Luke A. (@lukeai-tan)  
 - Shiroy (@SSHiroy)  
-- Luo Hongxun (@BestBearrr)  
+- Hongxun (@BestBearrr)  
