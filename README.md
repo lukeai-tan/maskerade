@@ -1,4 +1,5 @@
-# Maskerade  
+# Maskerade
+*by Team Breaking Byte*  
 AI-powered privacy filter for faces & sensitive information  
 
 ## Overview  
@@ -32,3 +33,8 @@ Frontend: HTML5, CSS3, JavaScript
 2. Setup a virtual environment. Example: run `python -m venv venv`
 3. Run `pip install -r requirements.txt`
 4. Run `python main.py` or `python main_debug.py` for development
+
+## Contributors  
+- Luke A. (@lukeai-tan)  
+- Shiroy (@SSHiroy)  
+- Luo Hongxun (@BestBearrr)  
