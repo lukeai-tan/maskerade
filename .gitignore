@@ -28,6 +28,7 @@ Thumbs.db
 
 # Image files
 .uploads/
+.outputs/
 
 # Docker
 *.dockerfile
